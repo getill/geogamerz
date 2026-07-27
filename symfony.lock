@@ -291,6 +291,9 @@
             "ref": "0df5844274d871b37fc3816c57a768ffc60a43a5"
         }
     },
+    "symfony/ux-toolkit": {
+        "version": "v3.3.0"
+    },
     "symfony/ux-turbo": {
         "version": "3.3",
         "recipe": {
@@ -359,6 +362,15 @@
             "branch": "main",
             "version": "0.14",
             "ref": "b7eaad0756e3f9b38764450655e6fea9614bc32a"
+        }
+    },
+    "tales-from-a-dev/twig-tailwind-extra": {
+        "version": "1.2",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "main",
+            "version": "0.2",
+            "ref": "7243ab070ed66198eb82c026684e9b9773e7b64a"
         }
     },
     "twig/extra-bundle": {
