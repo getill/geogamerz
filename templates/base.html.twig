@@ -19,6 +19,12 @@
         {% endif %}
     </head>
     <body>
-        {% block body %}{% endblock %}
+        {% block body %}
+            {% if app.user %}
+                <h2>🎉 Connecté avec succès en tant que : {{ app.user.userIdentifier }} !</h2>
+            {% else %}
+                <h2>❌ Non connecté...</h2>
+            {% endif %}
+        {% endblock %}
     </body>
 </html>
