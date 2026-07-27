@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello HomeController!{% endblock %}
+
+{% block body %}
+<style>
+    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+</style>
+
+<div class="leaderboard">
+    <h2>🏆 Top 10 des meilleurs joueurs</h2>
+
+    <ul>
+        {% for score in topScores %}
+            <li>
+                <strong>{{ score.player.userIdentifier }}</strong> : {{ score.points }} points
+            </li>
+        {% else %}
+            <li>Aucun score n'a été enregistré pour le moment. À toi de jouer !</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}
