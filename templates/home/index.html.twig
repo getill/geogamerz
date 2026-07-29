@@ -30,15 +30,11 @@
     <section id="leaderboard">
         <twig:Card class="overflow-hidden shadow-2xl border-border/50 bg-card/60 backdrop-blur-sm">
             <twig:Card:Header class="border-b bg-muted/10 pb-6">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <twig:Card:Title class="text-2xl font-bold flex items-center gap-3">
-                            <svg class="w-7 h-7 text-yellow-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
-                            Top 10 Global
-                        </twig:Card:Title>
-                        <twig:Card:Description class="mt-2 text-base">Le classement des joueurs les plus performants de cette saison.</twig:Card:Description>
-                    </div>
-                </div>
+                <twig:Card:Title class="text-2xl font-bold flex items-center gap-3">
+                    <svg class="w-7 h-7 text-yellow-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+                    Top 10 Global
+                </twig:Card:Title>
+                <twig:Card:Description class="mt-2 text-base">Le classement des joueurs les plus performants de cette saison.</twig:Card:Description>
             </twig:Card:Header>
             <twig:Card:Content class="p-0">
                 <twig:Table>
@@ -51,16 +47,17 @@
                     </twig:Table:Header>
                     <twig:Table:Body>
                         {% for score in topScores %}
+                            {% set currentLoopIndex = loop.index %}
                             <twig:Table:Row class="group transition-colors hover:bg-muted/30">
                                 <twig:Table:Cell class="px-8 py-5 align-middle font-medium">
-                                    {% if loop.index == 1 %}
+                                    {% if currentLoopIndex == 1 %}
                                         <span class="inline-flex items-center justify-center rounded-full bg-yellow-500/20 text-yellow-500 h-10 w-10 ring-1 ring-inset ring-yellow-500/30 font-bold shadow-[0_0_15px_rgba(234,179,8,0.25)] text-lg">1</span>
-                                    {% elseif loop.index == 2 %}
+                                    {% elseif currentLoopIndex == 2 %}
                                         <span class="inline-flex items-center justify-center rounded-full bg-slate-300/20 text-slate-300 h-10 w-10 ring-1 ring-inset ring-slate-300/30 font-bold shadow-[0_0_15px_rgba(203,213,225,0.2)] text-lg">2</span>
-                                    {% elseif loop.index == 3 %}
+                                    {% elseif currentLoopIndex == 3 %}
                                         <span class="inline-flex items-center justify-center rounded-full bg-orange-500/20 text-orange-500 h-10 w-10 ring-1 ring-inset ring-orange-500/30 font-bold shadow-[0_0_15px_rgba(249,115,22,0.2)] text-lg">3</span>
                                     {% else %}
-                                        <span class="text-muted-foreground inline-flex items-center justify-center h-10 w-10 text-lg font-medium">{{ loop.index }}</span>
+                                        <span class="text-muted-foreground inline-flex items-center justify-center h-10 w-10 text-lg font-medium">{{ currentLoopIndex }}</span>
                                     {% endif %}
                                 </twig:Table:Cell>
                                 <twig:Table:Cell class="px-8 py-5 align-middle">

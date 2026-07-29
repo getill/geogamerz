@@ -1,38 +1,57 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Log in!{% endblock %}
+{% block title %}Connexion - GeoGamerz{% endblock %}
 
 {% block body %}
-    <form method="post">
-        {% if error %}
-            <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-        {% endif %}
+<div class="flex min-h-[calc(100vh-8rem)] flex-col justify-center items-center py-12 sm:px-6 lg:px-8 animate-in fade-in zoom-in-95 duration-500">
+    
+    <div class="sm:mx-auto sm:w-full sm:max-w-md mb-6 text-center space-y-2">
+        <h1 class="text-3xl font-extrabold tracking-tight">Bienvenue</h1>
+        <p class="text-sm text-muted-foreground">Connectez-vous pour accéder à l'arène</p>
+    </div>
 
-        {% if app.user %}
-            <div class="mb-3">
-                You are logged in as {{ app.user.userIdentifier }}, <a href="{{ logout_path() }}">Logout</a>
-            </div>
-        {% endif %}
+    <twig:Card class="w-full sm:max-w-md shadow-2xl border-border/50 bg-card/60 backdrop-blur-md">
+        <twig:Card:Content class="pt-6">
+            <form method="post" class="space-y-6">
+                {% if error %}
+                    <twig:Badge variant="destructive" class="w-full justify-center py-2 text-sm mb-4">
+                        {{ error.messageKey|trans(error.messageData, 'security') }}
+                    </twig:Badge>
+                {% endif %}
 
-        <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
-        <label for="username">Username</label>
-        <input type="text" value="{{ last_username }}" name="_username" id="username" class="form-control" autocomplete="username" required autofocus>
-        <label for="password">Password</label>
-        <input type="password" name="_password" id="password" class="form-control" autocomplete="current-password" required>
-        <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
+                {% if app.user %}
+                    <div class="text-sm text-center mb-4 text-muted-foreground">
+                        Vous êtes connecté(e) en tant que <span class="font-bold text-foreground">{{ app.user.userIdentifier }}</span>.
+                        <a href="{{ logout_path() }}" class="text-primary hover:underline ml-1">Se déconnecter</a>
+                    </div>
+                {% endif %}
 
-        {#
-            Uncomment this section and add a remember_me option below your firewall to activate remember me functionality.
-            See https://symfony.com/doc/current/security/remember_me.html
+                <div class="space-y-4">
+                    <div class="space-y-2">
+                        <twig:Label for="username">Nom d'utilisateur</twig:Label>
+                        <twig:Input type="text" value="{{ last_username }}" name="_username" id="username" autocomplete="username" required autofocus placeholder="Votre pseudo" />
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <twig:Label for="password">Mot de passe</twig:Label>
+                        <twig:Input type="password" name="_password" id="password" autocomplete="current-password" required placeholder="••••••••" />
+                    </div>
+                </div>
 
-            <div class="checkbox mb-3">
-                <input type="checkbox" name="_remember_me" id="_remember_me">
-                <label for="_remember_me">Remember me</label>
-            </div>
-        #}
+                <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
 
-        <button class="btn btn-lg btn-primary" type="submit">
-            Sign in
-        </button>
-    </form>
+                <div class="pt-2">
+                    <twig:Button type="submit" class="w-full h-11 text-md font-semibold">
+                        Se connecter
+                    </twig:Button>
+                </div>
+                
+                <div class="mt-4 text-center text-sm text-muted-foreground">
+                    Pas encore de compte ? 
+                    <a href="{{ path('app_register') }}" class="font-medium text-primary hover:underline">Inscrivez-vous</a>
+                </div>
+            </form>
+        </twig:Card:Content>
+    </twig:Card>
+</div>
 {% endblock %}

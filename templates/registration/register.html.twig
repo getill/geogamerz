@@ -1,19 +1,56 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Register{% endblock %}
+{% block title %}Inscription - GeoGamerz{% endblock %}
 
 {% block body %}
-    <h1>Register</h1>
+<div class="flex min-h-[calc(100vh-8rem)] flex-col justify-center items-center py-12 sm:px-6 lg:px-8 animate-in fade-in zoom-in-95 duration-500">
+    
+    <div class="sm:mx-auto sm:w-full sm:max-w-md mb-6 text-center space-y-2">
+        <h1 class="text-3xl font-extrabold tracking-tight">Rejoignez-nous</h1>
+        <p class="text-sm text-muted-foreground">Créez votre compte pour participer au classement</p>
+    </div>
 
-    {{ form_errors(registrationForm) }}
+    <twig:Card class="w-full sm:max-w-md shadow-2xl border-border/50 bg-card/60 backdrop-blur-md">
+        <twig:Card:Content class="pt-6">
+            
+            {% if not registrationForm.vars.valid %}
+                <div class="mb-4 p-3 rounded-md bg-destructive/10 text-destructive text-sm font-medium border border-destructive/20">
+                    {{ form_errors(registrationForm) }}
+                </div>
+            {% endif %}
 
-    {{ form_start(registrationForm) }}
-        {{ form_row(registrationForm.username) }}
-        {{ form_row(registrationForm.plainPassword, {
-            label: 'Password'
-        }) }}
-        {{ form_row(registrationForm.agreeTerms) }}
+            {{ form_start(registrationForm, {'attr': {'class': 'space-y-5'}}) }}
+                
+                <div class="space-y-1">
+                    {{ form_label(registrationForm.username, 'Nom d\'utilisateur', {'label_attr': {'class': 'text-sm font-medium leading-none'}}) }}
+                    {{ form_widget(registrationForm.username, {'attr': {'class': 'flex h-9 w-full rounded-lg border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50'}}) }}
+                    {{ form_errors(registrationForm.username, {'attr': {'class': 'text-xs text-destructive mt-1'}}) }}
+                </div>
 
-        <button type="submit" class="btn">Register</button>
-    {{ form_end(registrationForm) }}
+                <div class="space-y-1">
+                    {{ form_label(registrationForm.plainPassword, 'Mot de passe', {'label_attr': {'class': 'text-sm font-medium leading-none'}}) }}
+                    {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'flex h-9 w-full rounded-lg border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50'}}) }}
+                    {{ form_errors(registrationForm.plainPassword, {'attr': {'class': 'text-xs text-destructive mt-1'}}) }}
+                </div>
+
+                <div class="flex items-center space-x-2 pt-2 pb-2">
+                    {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'h-4 w-4 rounded border-border text-primary focus:ring-primary accent-primary'}}) }}
+                    {{ form_label(registrationForm.agreeTerms, 'Accepter les conditions d\'utilisation', {'label_attr': {'class': 'text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'}}) }}
+                </div>
+
+                <div class="pt-2">
+                    <twig:Button type="submit" class="w-full h-11 text-md font-semibold">
+                        Créer mon compte
+                    </twig:Button>
+                </div>
+
+                <div class="mt-4 text-center text-sm text-muted-foreground">
+                    Déjà un compte ? 
+                    <a href="{{ path('app_login') }}" class="font-medium text-primary hover:underline">Connectez-vous</a>
+                </div>
+
+            {{ form_end(registrationForm) }}
+        </twig:Card:Content>
+    </twig:Card>
+</div>
 {% endblock %}

@@ -1,123 +1,187 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Game Guesser{% endblock %}
+{% block title %}Game Guesser - GeoGamerz{% endblock %}
 
 {% block body %}
-    <div class="game-container" style="text-align: center; font-family: sans-serif; padding: 20px;">
-        <h1>🎮 Game Guesser</h1>
-
-        <div id="loading" style="font-size: 1.2rem; margin-top: 20px;">Récupération des données depuis la base... 📡</div>
-
-        <div id="game-zone" style="display: none; max-width: 600px; margin: 0 auto; background: #f9f9f9; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-            <h2 id="manche-title">Manche 1</h2>
-
-            <div style="margin-bottom: 20px;">
-                <img id="game-image" src="" alt="Devinez le jeu" style="max-width: 100%; max-height: 400px; border: 2px solid #333; border-radius: 8px;">
-            </div>
-
-            <div style="display: flex; flex-direction: column; gap: 12px; max-width: 300px; margin: 0 auto;">
-                <input type="text" id="guess-name" placeholder="Nom du jeu" style="padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
-                <input type="text" id="guess-publisher" placeholder="Éditeur" style="padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
-                <input type="text" id="guess-coords" placeholder="Coordonnées" style="padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
-
-                <button id="btn-validate" style="padding: 12px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">Valider la manche</button>
-            </div>
-
-            <p id="feedback-message" style="font-weight: bold; margin-top: 20px; font-size: 1.1rem; color: #d35400;"></p>
-        </div>
+<div class="max-w-3xl mx-auto py-8 animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out">
+    <div class="text-center mb-10 space-y-3">
+        <h1 class="text-4xl font-extrabold tracking-tight lg:text-5xl">🎮 Game Guesser</h1>
+        <p class="text-lg text-muted-foreground">Testez vos connaissances en reconnaissant le jeu depuis l'image.</p>
     </div>
 
-    <script>
-        let manches = [];
-        let currentManche = 0;
-        let scoreTotal = 0;
+    <div id="loading" class="flex flex-col items-center justify-center space-y-4 py-12">
+        <svg class="h-10 w-10 animate-spin text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <p class="text-lg font-medium text-muted-foreground">Connexion satellite en cours... 📡</p>
+    </div>
 
-        // 1. Initialisation : on va chercher les vrais jeux en base de données
-        async function startGame() {
-            try {
-                const response = await fetch('/api/games');
-                manches = await response.json();
+    <div id="game-zone" style="display: none;">
+        <twig:Card class="overflow-hidden shadow-2xl border-border/50 bg-card/60 backdrop-blur-sm">
+            <twig:Card:Header class="border-b bg-muted/10 pb-4 text-center">
+                <twig:Card:Title id="manche-title" class="text-2xl font-bold tracking-tight">Manche 1</twig:Card:Title>
+                <twig:Card:Description>Identifiez le jeu, l'éditeur et ses coordonnées.</twig:Card:Description>
+            </twig:Card:Header>
+            
+            <twig:Card:Content class="p-6">
+                <div class="flex flex-col items-center space-y-8">
+                    <div class="w-full max-w-lg rounded-xl overflow-hidden border-2 border-border shadow-lg bg-black/5 flex items-center justify-center min-h-[250px]">
+                        <img id="game-image" src="" alt="Devinez le jeu" class="max-w-full max-h-[400px] object-contain transition-opacity duration-300">
+                    </div>
 
-                if (manches.length === 0) {
-                    document.getElementById('loading').innerText = "Oups, aucun jeu dans la base ! Ajoutes-en via EasyAdmin.";
-                    return;
-                }
+                    <div class="w-full max-w-md space-y-4">
+                        <div class="space-y-2">
+                            <label for="guess-name" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Nom du jeu</label>
+                            <twig:Input type="text" id="guess-name" placeholder="Ex: Super Mario 64" />
+                        </div>
+                        <div class="space-y-2">
+                            <label for="guess-publisher" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Éditeur</label>
+                            <twig:Input type="text" id="guess-publisher" placeholder="Ex: Nintendo" />
+                        </div>
+                        <div class="space-y-2">
+                            <label for="guess-coords" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Coordonnées</label>
+                            <twig:Input type="text" id="guess-coords" placeholder="Ex: 35.0116, 135.7681" />
+                        </div>
 
-                // On cache le texte de chargement et on affiche le jeu
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('game-zone').style.display = 'block';
+                        <div class="pt-4">
+                            <twig:Button id="btn-validate" class="w-full h-12 text-md font-bold">
+                                Valider la manche
+                            </twig:Button>
+                        </div>
+                    </div>
 
-                loadCurrentManche();
-            } catch (error) {
-                document.getElementById('loading').innerText = "Erreur de chargement de l'API.";
-                console.error(error);
+                    <div id="feedback-container" class="w-full text-center hidden">
+                        <twig:Badge id="feedback-badge" variant="outline" class="px-6 py-2 text-lg font-bold shadow-sm"></twig:Badge>
+                    </div>
+                </div>
+            </twig:Card:Content>
+        </twig:Card>
+    </div>
+</div>
+
+<script>
+    let manches = [];
+    let currentManche = 0;
+    let scoreTotal = 0;
+
+    async function startGame() {
+        try {
+            const response = await fetch('/api/games');
+            manches = await response.json();
+
+            if (manches.length === 0) {
+                document.getElementById('loading').innerHTML = '<p class="text-destructive font-semibold">Oups, aucun jeu dans la base ! Ajoutes-en via EasyAdmin.</p>';
+                return;
             }
+
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('game-zone').style.display = 'block';
+
+            loadCurrentManche();
+        } catch (error) {
+            document.getElementById('loading').innerHTML = '<p class="text-destructive font-semibold">Erreur de chargement de l\'API.</p>';
+            console.error(error);
+        }
+    }
+
+    function loadCurrentManche() {
+        const game = manches[currentManche];
+
+        document.getElementById('manche-title').innerText = `Manche ${currentManche + 1} / ${manches.length}`;
+        const img = document.getElementById('game-image');
+        img.style.opacity = '0';
+        setTimeout(() => {
+            img.src = game.imageUrl;
+            img.onload = () => img.style.opacity = '1';
+        }, 150);
+
+        document.getElementById('guess-name').value = '';
+        document.getElementById('guess-publisher').value = '';
+        document.getElementById('guess-coords').value = '';
+        
+        document.getElementById('feedback-container').classList.add('hidden');
+    }
+
+    document.getElementById('btn-validate').addEventListener('click', async () => {
+        const game = manches[currentManche];
+        let pointsManche = 0;
+
+        const guessName = document.getElementById('guess-name').value.toLowerCase().trim();
+        const guessPublisher = document.getElementById('guess-publisher').value.toLowerCase().trim();
+        const guessCoords = document.getElementById('guess-coords').value.trim();
+
+        if (guessName === game.name.toLowerCase()) pointsManche += 100;
+        if (guessPublisher === game.publisher.toLowerCase()) pointsManche += 100;
+        if (guessCoords === game.coordinates) pointsManche += 100;
+
+        scoreTotal += pointsManche;
+
+        const feedbackContainer = document.getElementById('feedback-container');
+        const feedbackBadge = document.getElementById('feedback-badge');
+        
+        feedbackContainer.classList.remove('hidden');
+        
+        if (pointsManche > 0) {
+            feedbackBadge.className = 'inline-flex items-center rounded-md border px-6 py-2 text-lg font-bold shadow-sm bg-primary/20 text-primary border-primary/30 transition-colors';
+            feedbackBadge.innerText = `+ ${pointsManche} points !`;
+        } else {
+            feedbackBadge.className = 'inline-flex items-center rounded-md border px-6 py-2 text-lg font-bold shadow-sm bg-destructive/10 text-destructive border-destructive/20 transition-colors';
+            feedbackBadge.innerText = `0 point... Oups !`;
         }
 
-        // 2. Chargement des données visuelles de la manche en cours
-        function loadCurrentManche() {
-            const game = manches[currentManche];
+        currentManche++;
 
-            document.getElementById('manche-title').innerText = `Manche ${currentManche + 1} / ${manches.length}`;
-            document.getElementById('game-image').src = game.imageUrl;
-
-            // On vide les champs de texte pour le joueur
-            document.getElementById('guess-name').value = '';
-            document.getElementById('guess-publisher').value = '';
-            document.getElementById('guess-coords').value = '';
-            document.getElementById('feedback-message').innerText = '';
-        }
-
-        // 3. Logique de validation au clic sur le bouton
-        document.getElementById('btn-validate').addEventListener('click', async () => {
-            const game = manches[currentManche];
-            let pointsManche = 0;
-
-            // On récupère les valeurs entrées par le joueur (en minuscules pour faciliter la comparaison)
-            const guessName = document.getElementById('guess-name').value.toLowerCase().trim();
-            const guessPublisher = document.getElementById('guess-publisher').value.toLowerCase().trim();
-            const guessCoords = document.getElementById('guess-coords').value.trim();
-
-            // Système de points (100 points par bonne réponse)
-            if (guessName === game.name.toLowerCase()) pointsManche += 100;
-            if (guessPublisher === game.publisher.toLowerCase()) pointsManche += 100;
-            if (guessCoords === game.coordinates) pointsManche += 100;
-
-            scoreTotal += pointsManche;
-
-            document.getElementById('feedback-message').innerText = `Tu as gagné ${pointsManche} points sur cette manche !`;
-
-            currentManche++;
-
-            // 4. Passage à la suite ou Fin du jeu
-            if (currentManche < manches.length) {
-                // On passe à la manche suivante après 1,5 seconde
-                setTimeout(loadCurrentManche, 1500);
-            } else {
-                // Fin du jeu : on envoie le score final à la route /api/score
-                document.getElementById('game-zone').innerHTML = `
-                <h2>Fin de la partie ! 🏆</h2>
-                <p>Score final : <strong>${scoreTotal} points</strong>.</p>
-                <p id="save-status">Enregistrement en cours...</p>
+        if (currentManche < manches.length) {
+            setTimeout(loadCurrentManche, 2000);
+        } else {
+            const gameZone = document.getElementById('game-zone');
+            
+            let messageHtml = `
+            <div class="text-center space-y-6 py-8">
+                <h2 class="text-4xl font-extrabold">Partie Terminée ! 🏆</h2>
+                <div class="inline-flex items-center justify-center rounded-full bg-primary/10 w-32 h-32 border-4 border-primary/20 shadow-[0_0_30px_rgba(var(--color-primary),0.2)]">
+                    <span class="text-4xl font-black text-primary">${scoreTotal}</span>
+                </div>
+                <p class="text-lg text-muted-foreground">points cumulés.</p>
+                <div id="save-status" class="pt-4 flex justify-center">
+                    <svg class="h-8 w-8 animate-spin text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </div>
+                <div class="pt-6">
+                    <a href="/" class="inline-flex h-10 items-center justify-center rounded-md border border-border bg-background px-8 text-sm font-medium transition-colors hover:bg-muted hover:text-foreground">
+                        Retour au classement
+                    </a>
+                </div>
+            </div>`;
+            
+            gameZone.innerHTML = `
+                <div class="overflow-hidden shadow-2xl border border-border/50 rounded-xl bg-card/60 backdrop-blur-sm p-8">
+                    ${messageHtml}
+                </div>
             `;
 
-                try {
-                    const response = await fetch('/api/score', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ points: scoreTotal })
-                    });
+            try {
+                const response = await fetch('/api/score', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ points: scoreTotal })
+                });
 
-                    if (response.ok) {
-                        document.getElementById('save-status').innerHTML = `<span style="color: green;">Score sauvegardé avec succès ! Retourne à l'accueil pour voir le classement.</span>`;
-                    }
-                } catch (error) {
-                    console.error("Erreur lors de la sauvegarde du score", error);
+                const saveStatus = document.getElementById('save-status');
+                if (response.ok) {
+                    saveStatus.innerHTML = `<span class="inline-flex items-center px-4 py-2 rounded-md bg-green-500/20 text-green-600 dark:text-green-400 font-medium"><svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Score sauvegardé !</span>`;
+                } else {
+                    saveStatus.innerHTML = `<span class="inline-flex items-center px-4 py-2 rounded-md bg-destructive/20 text-destructive font-medium">Erreur lors de la sauvegarde.</span>`;
                 }
+            } catch (error) {
+                console.error("Erreur lors de la sauvegarde du score", error);
             }
-        });
+        }
+    });
 
-        // On lance la machine
-        startGame();
-    </script>
+    startGame();
+</script>
 {% endblock %}
