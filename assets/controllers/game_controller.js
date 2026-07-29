@@ -9,6 +9,29 @@ const FIELD_DEFS = [
 
 const LEVEL_MAX_FIELDS = { 1: 1, 2: 2, 3: FIELD_DEFS.length };
 const ACTIVE_CLASSES = ['border-primary', 'bg-primary/10', 'text-primary'];
+const FUZZY_FIELDS = ['name', 'publisher', 'protagonist'];
+const FUZZY_MIN_LENGTH = 3;
+
+function normalize(value) {
+    return String(value)
+        .trim()
+        .toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9\s]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+function isCorrectGuess(fieldKey, rawGuess, rawTarget) {
+    const guess = normalize(rawGuess);
+    const target = normalize(rawTarget);
+    if (guess.length === 0) return false;
+    if (guess === target) return true;
+    if (FUZZY_FIELDS.includes(fieldKey) && guess.length >= FUZZY_MIN_LENGTH) {
+        return target.includes(guess) || guess.includes(target);
+    }
+    return false;
+}
 
 const DEFAULT_LEVEL = 2;
 const DEFAULT_ROUNDS = 10;
@@ -139,6 +162,7 @@ export default class extends Controller {
             const row = this.formTarget.querySelector(`.field-row[data-field="${f.key}"]`);
             const input = row.querySelector('input');
             const status = row.querySelector('.field-status');
+            const answer = row.querySelector('.field-answer');
             const visible = this.visibleFields.includes(f);
 
             row.classList.toggle('hidden', !visible);
@@ -150,6 +174,8 @@ export default class extends Controller {
             status.textContent = '';
             status.classList.remove('scale-100', 'opacity-100', 'text-green-500', 'dark:text-green-400', 'text-destructive');
             status.classList.add('scale-0', 'opacity-0');
+            answer.textContent = '';
+            answer.classList.add('hidden');
 
             if (visible) {
                 row.classList.remove('motion-safe:animate-in', 'motion-safe:fade-in');
@@ -174,9 +200,8 @@ export default class extends Controller {
             const row = this.formTarget.querySelector(`.field-row[data-field="${f.key}"]`);
             const input = row.querySelector('input');
             const status = row.querySelector('.field-status');
-            const guess = input.value.trim().toLowerCase();
-            const target = String(game[f.key]).trim().toLowerCase();
-            const ok = guess.length > 0 && guess === target;
+            const answer = row.querySelector('.field-answer');
+            const ok = isCorrectGuess(f.key, input.value, game[f.key]);
 
             if (ok) correct++;
             input.disabled = true;
@@ -184,6 +209,10 @@ export default class extends Controller {
             row.classList.add(ok ? 'border-green-500/40' : 'border-destructive/50');
             status.textContent = ok ? '✓' : '✕';
             status.classList.remove('scale-0', 'opacity-0');
+            if (!ok) {
+                answer.textContent = `Réponse : ${game[f.key]}`;
+                answer.classList.remove('hidden');
+            }
             status.classList.add('scale-100', 'opacity-100', ok ? 'text-green-500' : 'text-destructive');
             if (ok) status.classList.add('dark:text-green-400');
         });
