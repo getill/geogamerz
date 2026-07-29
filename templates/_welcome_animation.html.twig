@@ -1,0 +1,15 @@
+<div class="welcome-overlay" data-controller="welcome" data-welcome-dismiss-after-value="4200">
+    <div class="welcome-beam"></div>
+    <div class="welcome-embers" data-welcome-target="embers"></div>
+    <div class="welcome-content">
+        <span class="welcome-tag">Saison 1 · Connexion</span>
+        <h1 class="welcome-title">Bienvenue</h1>
+        <div class="welcome-username-wrap">
+            <div class="welcome-glow" aria-hidden="true">{{ username }}</div>
+            <div class="welcome-username">{{ username }}</div>
+        </div>
+        <div class="welcome-rule"></div>
+        <p class="welcome-sub">Prêt à dominer le classement ?</p>
+        <button type="button" class="welcome-cta" data-action="click->welcome#dismiss">Entrer dans l'arène</button>
+    </div>
+</div>
