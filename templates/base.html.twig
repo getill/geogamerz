@@ -30,6 +30,9 @@
             <div class="flex flex-1 items-center justify-between space-x-6 md:justify-end">
                 <nav class="flex items-center space-x-6 text-sm font-medium">
                     <a href="{{ path('app_game') }}" class="transition-colors hover:text-foreground/80 text-foreground/60">Jeux</a>
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <a href="{{ path('admin') }}" class="transition-colors hover:text-foreground/80 text-foreground/60">Administration</a>
+                    {% endif %}
                 </nav>
                 <div class="flex items-center space-x-4">
                     {% if app.user %}
