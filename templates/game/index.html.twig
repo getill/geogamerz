@@ -27,10 +27,55 @@
 {% endblock %}
 
 {% block body %}
-<div class="max-w-4xl mx-auto py-8 animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out">
+<div class="max-w-4xl mx-auto py-8 animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out" data-controller="game">
+
+    {# Setup: difficulty & round count #}
+    <div id="hud-setup" class="max-w-md mx-auto" data-game-target="setup">
+        <div class="relative rounded-2xl border border-border bg-card/60 backdrop-blur-sm shadow-2xl px-10 py-10">
+            <twig:Badge variant="secondary" class="mb-6 gap-2 h-auto py-1 px-3 font-mono text-[11px] tracking-widest uppercase">
+                <span class="relative flex h-1.5 w-1.5">
+                    <span class="motion-safe:animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-primary"></span>
+                </span>
+                Paramètres de mission
+            </twig:Badge>
+
+            <div class="mb-6">
+                <p class="font-mono text-[11px] uppercase tracking-widest text-muted-foreground mb-3">&gt; Niveau de difficulté</p>
+                <div class="grid grid-cols-3 gap-2" id="level-select">
+                    <button type="button" data-level="1" data-game-target="levelButton" data-action="click->game#selectLevel" class="level-btn flex flex-col items-center justify-center gap-0.5 rounded-lg border border-border py-3 font-mono transition-colors hover:border-primary hover:text-primary">
+                        <span class="text-lg font-bold">1</span>
+                        <span class="text-[10px] normal-case text-muted-foreground">Facile</span>
+                    </button>
+                    <button type="button" data-level="2" data-game-target="levelButton" data-action="click->game#selectLevel" class="level-btn flex flex-col items-center justify-center gap-0.5 rounded-lg border border-border py-3 font-mono transition-colors hover:border-primary hover:text-primary">
+                        <span class="text-lg font-bold">2</span>
+                        <span class="text-[10px] normal-case text-muted-foreground">Moyen</span>
+                    </button>
+                    <button type="button" data-level="3" data-game-target="levelButton" data-action="click->game#selectLevel" class="level-btn flex flex-col items-center justify-center gap-0.5 rounded-lg border border-border py-3 font-mono transition-colors hover:border-primary hover:text-primary">
+                        <span class="text-lg font-bold">3</span>
+                        <span class="text-[10px] normal-case text-muted-foreground">Difficile</span>
+                    </button>
+                </div>
+                <p class="mt-2 text-[11px] text-muted-foreground">Plus le niveau est élevé, plus il faut d'infos correctes pour valider une manche.</p>
+            </div>
+
+            <div class="mb-8">
+                <p class="font-mono text-[11px] uppercase tracking-widest text-muted-foreground mb-3">&gt; Nombre de manches</p>
+                <div class="grid grid-cols-3 gap-2" id="rounds-select">
+                    <button type="button" data-rounds="5" data-game-target="roundsButton" data-action="click->game#selectRounds" class="rounds-btn flex items-center justify-center rounded-lg border border-border py-3 font-mono text-lg font-bold transition-colors hover:border-primary hover:text-primary">5</button>
+                    <button type="button" data-rounds="10" data-game-target="roundsButton" data-action="click->game#selectRounds" class="rounds-btn flex items-center justify-center rounded-lg border border-border py-3 font-mono text-lg font-bold transition-colors hover:border-primary hover:text-primary">10</button>
+                    <button type="button" data-rounds="15" data-game-target="roundsButton" data-action="click->game#selectRounds" class="rounds-btn flex items-center justify-center rounded-lg border border-border py-3 font-mono text-lg font-bold transition-colors hover:border-primary hover:text-primary">15</button>
+                </div>
+            </div>
+
+            <twig:Button type="button" id="start-game-btn" data-game-target="startButton" data-action="click->game#start" class="w-full h-12 text-md font-bold">
+                Lancer la partie
+            </twig:Button>
+        </div>
+    </div>
 
     {# Boot / connection sequence #}
-    <div id="hud-boot" class="max-w-md mx-auto">
+    <div id="hud-boot" class="max-w-md mx-auto hidden" data-game-target="boot">
         <div class="relative rounded-2xl border border-border bg-card/60 backdrop-blur-sm shadow-2xl px-10 py-12 text-center">
             <twig:Badge variant="secondary" class="mb-6 gap-2 h-auto py-1 px-3 font-mono text-[11px] tracking-widest uppercase">
                 <span class="relative flex h-1.5 w-1.5">
@@ -47,25 +92,25 @@
             </div>
 
             <div class="font-mono text-[13px] text-muted-foreground text-left min-h-[80px] space-y-2 mb-6" id="boot-lines">
-                <p class="hud-boot-line">&gt; Connexion au satellite...</p>
-                <p class="hud-boot-line">&gt; Synchronisation des manches...</p>
-                <p class="hud-boot-line">&gt; Calibrage du viseur...</p>
+                <p class="hud-boot-line" data-game-target="bootLine">&gt; Connexion au satellite...</p>
+                <p class="hud-boot-line" data-game-target="bootLine">&gt; Synchronisation des manches...</p>
+                <p class="hud-boot-line" data-game-target="bootLine">&gt; Calibrage du viseur...</p>
             </div>
 
             <div class="h-1.5 rounded-full bg-muted overflow-hidden">
-                <div id="boot-bar" class="h-full rounded-full bg-primary shadow-[0_0_12px_1px_rgba(220,38,38,0.6)]" style="width: 0%"></div>
+                <div id="boot-bar" data-game-target="bootBar" class="h-full rounded-full bg-primary shadow-[0_0_12px_1px_rgba(220,38,38,0.6)]" style="width: 0%"></div>
             </div>
         </div>
     </div>
 
     {# Active round #}
-    <div id="hud-game" class="hidden">
+    <div id="hud-game" class="hidden" data-game-target="game">
         <twig:Badge variant="secondary" class="mb-4 gap-2 h-auto py-1 px-3 font-mono text-[11px] tracking-widest uppercase">
             <span class="relative flex h-1.5 w-1.5">
                 <span class="motion-safe:animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                 <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-primary"></span>
             </span>
-            <span id="round-counter">Manche 1/1</span>
+            <span id="round-counter" data-game-target="roundCounter">Manche 1/1</span>
         </twig:Badge>
 
         <div class="grid gap-7 md:grid-cols-2 items-start">
@@ -79,9 +124,9 @@
                 <span class="absolute bottom-1 right-1 w-6 h-6 border-b-2 border-r-2 border-primary rounded-br-md z-10"></span>
 
                 <div class="relative w-full h-full rounded-2xl overflow-hidden border border-border shadow-2xl bg-black/20">
-                    <img id="game-image" src="" alt="Devinez le jeu" class="w-full h-full object-cover transition-opacity duration-300">
+                    <img id="game-image" data-game-target="image" src="" alt="Devinez le jeu" class="w-full h-full object-contain transition-opacity duration-300">
                     <span class="absolute left-0 right-0 h-0.5 bg-primary/80 shadow-[0_0_12px_2px_rgba(220,38,38,0.7)] animate-hud-scan motion-reduce:hidden" aria-hidden="true"></span>
-                    <span id="target-label" class="absolute bottom-2 left-2 font-mono text-[10px] uppercase tracking-wider text-primary bg-background/60 backdrop-blur px-1.5 py-0.5 rounded"></span>
+                    <span id="target-label" data-game-target="targetLabel" class="absolute bottom-2 left-2 font-mono text-[10px] uppercase tracking-wider text-primary bg-background/60 backdrop-blur px-1.5 py-0.5 rounded"></span>
                 </div>
             </div>
 
@@ -91,7 +136,7 @@
                 <h1 class="text-2xl font-black uppercase tracking-tight mb-1">Devine le jeu</h1>
                 <p class="text-sm text-muted-foreground mb-5">Renseigne les champs détectés pour ce titre.</p>
 
-                <form id="guess-form" class="space-y-3">
+                <form id="guess-form" class="space-y-3" data-game-target="form" data-action="submit->game#submitGuess">
                     <div class="field-row hidden items-center gap-2.5 border-b border-dashed border-border pb-2.5" data-field="name">
                         <span class="font-mono text-primary text-xs shrink-0">›</span>
                         <label for="guess-name" class="font-mono text-[10px] uppercase tracking-wide text-muted-foreground w-28 shrink-0">Nom du jeu</label>
@@ -121,229 +166,16 @@
                         <span class="field-status w-5 text-center text-sm scale-0 opacity-0 transition-all duration-200"></span>
                     </div>
 
-                    <twig:Button type="submit" class="w-full h-12 text-md font-bold mt-2">
+                    <twig:Button type="submit" data-game-target="submitButton" class="w-full h-12 text-md font-bold mt-2">
                         Valider la manche
                     </twig:Button>
                 </form>
 
-                <div id="round-result" class="hidden mt-4 flex items-center justify-between gap-3"></div>
+                <div id="round-result" class="hidden mt-4 flex items-center justify-between gap-3" data-game-target="result"></div>
             </twig:Card>
         </div>
     </div>
 
-    <div id="hud-finish" class="hidden max-w-lg mx-auto"></div>
+    <div id="hud-finish" class="hidden max-w-lg mx-auto" data-game-target="finish"></div>
 </div>
-
-<script>
-    const FIELD_DEFS = [
-        { key: 'name', id: 'guess-name' },
-        { key: 'releaseYear', id: 'guess-year' },
-        { key: 'publisher', id: 'guess-publisher' },
-        { key: 'protagonist', id: 'guess-protagonist' },
-    ];
-
-    let manches = [];
-    let currentManche = 0;
-    let scoreTotal = 0;
-    let visibleFields = [];
-
-    const bootEl = document.getElementById('hud-boot');
-    const gameEl = document.getElementById('hud-game');
-    const finishEl = document.getElementById('hud-finish');
-
-    function runBootSequence() {
-        return new Promise((resolve) => {
-            const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-            const totalDuration = reduced ? 150 : 1500;
-            const lines = [...document.querySelectorAll('#boot-lines .hud-boot-line')];
-            const bar = document.getElementById('boot-bar');
-            const perLine = totalDuration / lines.length;
-            const lineDuration = reduced ? 40 : 420;
-
-            bar.style.transitionProperty = 'width';
-            bar.style.transitionDuration = totalDuration + 'ms';
-            bar.style.transitionTimingFunction = 'linear';
-            requestAnimationFrame(() => { bar.style.width = '100%'; });
-
-            lines.forEach((line, i) => {
-                setTimeout(() => {
-                    lines.forEach((l) => l.removeAttribute('data-active'));
-                    line.setAttribute('data-active', '');
-                }, i * perLine);
-                setTimeout(() => {
-                    line.setAttribute('data-done', '');
-                    line.removeAttribute('data-active');
-                }, i * perLine + lineDuration);
-            });
-
-            setTimeout(resolve, totalDuration + 150);
-        });
-    }
-
-    function showBootError(message) {
-        bootEl.innerHTML = `<p class="text-center text-destructive font-semibold">${message}</p>`;
-    }
-
-    async function startGame() {
-        let fetchError = null;
-        const bootPromise = runBootSequence();
-        const fetchPromise = fetch('/api/games')
-            .then((r) => r.json())
-            .then((data) => { manches = data; })
-            .catch((err) => { fetchError = err; });
-
-        await Promise.all([bootPromise, fetchPromise]);
-
-        if (fetchError) {
-            showBootError('Erreur de chargement de l\'API.');
-            console.error(fetchError);
-            return;
-        }
-        if (manches.length === 0) {
-            showBootError('Oups, aucun jeu dans la base ! Ajoutes-en via EasyAdmin.');
-            return;
-        }
-
-        bootEl.classList.add('hidden');
-        gameEl.classList.remove('hidden');
-        gameEl.classList.add('motion-safe:animate-in', 'motion-safe:fade-in', 'motion-safe:slide-in-from-bottom-2', 'duration-500');
-
-        loadCurrentManche();
-    }
-
-    function loadCurrentManche() {
-        const game = manches[currentManche];
-        visibleFields = FIELD_DEFS.filter((f) => game[f.key] !== null && game[f.key] !== undefined && game[f.key] !== '');
-
-        document.getElementById('round-counter').textContent = `Manche ${currentManche + 1}/${manches.length}`;
-        document.getElementById('target-label').textContent = `TARGET_${String(currentManche + 1).padStart(2, '0')}.IMG`;
-
-        const img = document.getElementById('game-image');
-        img.style.opacity = '0';
-        setTimeout(() => {
-            img.src = game.imageUrl;
-            img.onload = () => { img.style.opacity = '1'; };
-        }, 150);
-
-        FIELD_DEFS.forEach((f, i) => {
-            const row = document.querySelector(`.field-row[data-field="${f.key}"]`);
-            const input = document.getElementById(f.id);
-            const status = row.querySelector('.field-status');
-            const visible = visibleFields.includes(f);
-
-            row.classList.toggle('hidden', !visible);
-            row.classList.toggle('flex', visible);
-            row.classList.remove('border-green-500/40', 'border-destructive/50');
-            row.classList.add('border-border');
-            input.value = '';
-            input.disabled = false;
-            status.textContent = '';
-            status.classList.remove('scale-100', 'opacity-100', 'text-green-500', 'dark:text-green-400', 'text-destructive');
-            status.classList.add('scale-0', 'opacity-0');
-
-            if (visible) {
-                row.classList.remove('motion-safe:animate-in', 'motion-safe:fade-in');
-                void row.offsetWidth;
-                row.style.animationDelay = `${i * 60}ms`;
-                row.classList.add('motion-safe:animate-in', 'motion-safe:fade-in');
-            }
-        });
-
-        const submitBtn = document.querySelector('#guess-form button[type="submit"]');
-        submitBtn.disabled = false;
-
-        const result = document.getElementById('round-result');
-        result.classList.add('hidden');
-        result.innerHTML = '';
-    }
-
-    document.getElementById('guess-form').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const game = manches[currentManche];
-        let correct = 0;
-
-        visibleFields.forEach((f) => {
-            const row = document.querySelector(`.field-row[data-field="${f.key}"]`);
-            const input = document.getElementById(f.id);
-            const status = row.querySelector('.field-status');
-            const guess = input.value.trim().toLowerCase();
-            const target = String(game[f.key]).trim().toLowerCase();
-            const ok = guess.length > 0 && guess === target;
-
-            if (ok) correct++;
-            input.disabled = true;
-            row.classList.remove('border-border');
-            row.classList.add(ok ? 'border-green-500/40' : 'border-destructive/50');
-            status.textContent = ok ? '✓' : '✕';
-            status.classList.remove('scale-0', 'opacity-0');
-            status.classList.add('scale-100', 'opacity-100', ok ? 'text-green-500' : 'text-destructive');
-            if (ok) status.classList.add('dark:text-green-400');
-        });
-
-        document.querySelector('#guess-form button[type="submit"]').disabled = true;
-
-        const pointsManche = correct * 100;
-        scoreTotal += pointsManche;
-
-        const result = document.getElementById('round-result');
-        result.classList.remove('hidden');
-        result.innerHTML = `<span class="font-mono text-sm text-muted-foreground">SCORE&nbsp;: <span class="text-primary font-bold text-lg">${pointsManche}</span> / ${visibleFields.length * 100}</span>`;
-
-        currentManche++;
-
-        if (currentManche < manches.length) {
-            const nextBtn = document.createElement('button');
-            nextBtn.type = 'button';
-            nextBtn.className = 'inline-flex h-9 items-center justify-center rounded-lg border border-border px-4 text-sm font-medium transition-colors hover:bg-muted hover:border-primary hover:text-primary';
-            nextBtn.textContent = 'Manche suivante →';
-            nextBtn.addEventListener('click', loadCurrentManche);
-            result.appendChild(nextBtn);
-        } else {
-            setTimeout(showFinish, 1200);
-        }
-    });
-
-    async function showFinish() {
-        gameEl.classList.add('hidden');
-        finishEl.classList.remove('hidden');
-        finishEl.innerHTML = `
-            <div class="rounded-2xl border border-border bg-card/60 backdrop-blur-sm shadow-2xl p-10 text-center motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 duration-500">
-                <p class="font-mono text-xs uppercase tracking-widest text-primary mb-2">&gt; Mission terminée</p>
-                <h2 class="text-3xl font-black uppercase tracking-tight mb-6">Partie terminée</h2>
-                <div class="inline-flex items-center justify-center rounded-full bg-primary/10 w-32 h-32 border-4 border-primary/20 shadow-[0_0_30px_rgba(220,38,38,0.2)] mb-4">
-                    <span class="text-4xl font-black text-primary">${scoreTotal}</span>
-                </div>
-                <p class="text-muted-foreground mb-6">points cumulés.</p>
-                <div id="save-status" class="flex justify-center mb-6">
-                    <svg class="h-8 w-8 animate-spin text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                </div>
-                <a href="/" class="inline-flex h-10 items-center justify-center rounded-md border border-border bg-background px-8 text-sm font-medium transition-colors hover:bg-muted hover:text-foreground">
-                    Retour au classement
-                </a>
-            </div>
-        `;
-
-        try {
-            const response = await fetch('/api/score', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ points: scoreTotal }),
-            });
-
-            const saveStatus = document.getElementById('save-status');
-            if (response.ok) {
-                saveStatus.innerHTML = `<span class="inline-flex items-center px-4 py-2 rounded-md bg-green-500/20 text-green-600 dark:text-green-400 font-medium"><svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Score sauvegardé !</span>`;
-            } else {
-                saveStatus.innerHTML = `<span class="inline-flex items-center px-4 py-2 rounded-md bg-destructive/20 text-destructive font-medium">Erreur lors de la sauvegarde.</span>`;
-            }
-        } catch (error) {
-            console.error('Erreur lors de la sauvegarde du score', error);
-        }
-    }
-
-    startGame();
-</script>
 {% endblock %}

@@ -48,9 +48,15 @@ final class GameController extends AbstractController
     }
 
     #[Route('/api/games', name: 'api_get_games', methods: ['GET'])]
-    public function getGames(EntityManagerInterface $entityManager): JsonResponse
+    public function getGames(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
         $games = $entityManager->getRepository(Game::class)->findAll();
+        shuffle($games);
+
+        $limit = (int) $request->query->get('limit', 0);
+        if ($limit > 0) {
+            $games = array_slice($games, 0, $limit);
+        }
 
         $gamesArray = [];
         foreach ($games as $game) {
